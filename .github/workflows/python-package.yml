@@ -19,7 +19,7 @@ jobs:
         pip install requests numpy pandas
     - name: Run Python
       run: |
-        python cncme_whole.py
+        python cnemc_whole.py
     - name: Commit changes
       run: |
         git config --global user.email BOT@github.com
