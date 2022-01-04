@@ -1,11 +1,9 @@
-
-  
 name: Python Package
 
 on:
-  push:
+#   push:
   schedule:
-    - cron: '41,19 * * * *'
+    - cron: '36,6 * * * *'
 
 jobs:
   build-linux:
