@@ -2,8 +2,9 @@ name: Python Package
 
 on:
 #   push:
+  workflow_dispatch:
   schedule:
-    - cron: '36,56,6 * * * *'
+    - cron: '36,6 * * * *'
 
 jobs:
   build-linux:
