@@ -18,7 +18,7 @@
 ### 本地部署
 - 获取原始 wcf 格式的文件
 ```sh
-/usr/bin/wget "https://air.cnemc.cn:18007/emcpublish/ClientBin/Env-CnemcPublish-RiaServices-EnvCnemcPublishDomainService.svc/binary/GetAQIDataPublishLives" -O /home/yourName/cnemc_$(date +%Y%m%d%H%M)
+/usr/bin/wget "https://air.cnemc.cn:18007/emcpublish/ClientBin/Env-CnemcPublish-RiaServices-EnvCnemcPublishDomainService.svc/binary/GetAQIDataPublishLives" --no-check-certificate -O /home/yourName/cnemc_$(date +%Y%m%d%H%M)
 ```
 
 - 设置定时任务
