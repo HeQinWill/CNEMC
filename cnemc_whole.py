@@ -7,7 +7,7 @@ import xml.dom.minidom
 import pandas as pd
 import numpy as np
 from pathlib import Path
-
+requests.packages.urllib3.disable_warnings()
 
 def xmlparse(xmlstr):
     '''
@@ -51,7 +51,7 @@ def data_from_xml_json(xmlfile):
 
 if __name__ == "__main__":
     # 从API请求数据
-    r = requests.get("https://air.cnemc.cn:18007/emcpublish/ClientBin/Env-CnemcPublish-RiaServices-EnvCnemcPublishDomainService.svc/binary/GetAQIDataPublishLives")
+    r = requests.get("https://air.cnemc.cn:18007/emcpublish/ClientBin/Env-CnemcPublish-RiaServices-EnvCnemcPublishDomainService.svc/binary/GetAQIDataPublishLives", verify=False)
     # r = open('cnemc_202104271813','rb') # 本地文件则可以直接打开
 
     # 解析数据,将其变为类似于从文件读取数据的形式
