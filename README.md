@@ -1,7 +1,7 @@
 ##  [CNEMC](http://106.37.208.233:20035/) 
 从中国环境总站采集空气质量六参数（逐小时更新）  
 数据发布说明里需注意的地方  
-> - 监测点位1小时浓度平均值指该点位1小时内所测项目浓度的算术平均值或测量值，如16时的小时均值为15：00-16:00的算术平均值或测量值。
+> - 监测点位1小时浓度平均值指该点位1小时内所测项目浓度的算术平均值或测量值，如16时的小时均值为15:00-16:00的算术平均值或测量值。
 > - 8小时滑动平均值是指当前小时前8小时内所测项目小时浓度的算术平均值。
 > - 发布结果通常为每小时更新1次，由于数据传输需要一定的时间，发布的数据约有半小时延滞，例如15时的监测数据在15:30左右发布。
 
@@ -16,9 +16,29 @@
 对于其他五参数，`x`代表最近 1 小时浓度均值，`x_24`代表最近 24 小时中 1 小时浓度均值的均值。
 
 ### 本地部署
-- 获取原始 wcf 格式的文件
+- 获取返回的 JSON 格式站点观测结果
 ```sh
-/usr/bin/wget "https://air.cnemc.cn:18007/emcpublish/ClientBin/Env-CnemcPublish-RiaServices-EnvCnemcPublishDomainService.svc/binary/GetAQIDataPublishLives" --no-check-certificate -O /home/yourName/cnemc_$(date +%Y%m%d%H%M)
+/usr/bin/wget "https://air.cnemc.cn:18007/HourChangesPublish/GetAllAQIPublishLive" --no-check-certificate -O /home/yourName/cnemc_$(date +%Y%m%d%H%M)
+```
+或者
+```sh
+curl -k 'https://air.cnemc.cn:18007/HourChangesPublish/GetAllAQIPublishLive' \
+  -X 'POST' \
+  -H 'Accept: */*' \
+  -H 'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Length: 0' \
+  -H 'Origin: https://air.cnemc.cn:18007' \
+  -H 'Referer: https://air.cnemc.cn:18007/' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0' \
+  -H 'X-Requested-With: XMLHttpRequest' \
+  -H 'sec-ch-ua: "Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -o cnemc_$(date +%Y%m%d%H%M).json
 ```
 
 - 设置定时任务
@@ -26,7 +46,7 @@
 13,43 * * * * /usr/bin/bash /home/yourName/cnemc.sh
 ```
 
-- [定期转为 wcf 数据为 csv 并归档](https://github.com/HeQinWill/CNEMC/blob/main/conWCFarcCSV.ipynb)
+- ~[定期转为 wcf 数据为 csv 并归档](https://github.com/HeQinWill/CNEMC/blob/main/conWCFarcCSV.ipynb)~  现在接口直接返回的是 JSON 格式数据，无需使用 wcf 工具解析
 ---
 ### 数据问题记录
 - 2022-03-07T11.csv中 `1742A 阳泉市平坦` 站点，`so2_24h` 爬取的记录原先为 `28`，之后为 `20`，最终选择了 `20`  
