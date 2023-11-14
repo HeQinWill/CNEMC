@@ -1,74 +1,43 @@
 # -*- coding: utf8 -*-
 import requests
-from io import BytesIO, BufferedReader, StringIO
-from wcf.records import Record, print_records
-from contextlib import redirect_stdout
-import xml.dom.minidom
+import json
 import pandas as pd
 import numpy as np
 from pathlib import Path
 requests.packages.urllib3.disable_warnings()
 
-def xmlparse(xmlstr):
-    '''
-    parse air quality xml data to dict list
-    '''
-    dom = xml.dom.minidom.parseString(xmlstr)
-    # root = dom.documentElement
-    stats = dom.getElementsByTagName("AQIDataPublishLive")
-    airdata = []
-    for stat in stats:
-        # print(len(stat.childNodes))
-        r = {}
-        for node in stat.childNodes:
-            if (node.nodeName == "#text" or
-                    node.nodeName == "OpenAccessGenerated"):
-                continue
-            inx = node.nodeName
-            inx = inx.lower()
-            for n in node.childNodes:
-                # print(n.data)
-                r[inx] = n.data
-        airdata.append(r)
-    return airdata
-
-
-def data_from_xml_json(xmlfile):
-    '''
-    预处理由 wcf 转换后的 xml，将不必要的字符删除
-    '''
-    # fp = open(xmlfile) # 如果是之前存储下来的文件需要先 open
-    # data = fp.read()
-    data = xmlfile
-
-    # this is for the air quality data, to split some charicters
-    data = data.replace("a:", "")
-    data = data.replace("b:", "")
-    data = data.replace("c:", "")
-    data = data.replace("&mdash", "-")
-    return xmlparse(data)
-
+headers = {
+    'Accept': '*/*',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+    'Connection': 'keep-alive',
+    'Origin': 'https://air.cnemc.cn:18007',
+    'Referer': 'https://air.cnemc.cn:18007/',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0',
+    'X-Requested-With': 'XMLHttpRequest',
+    'sec-ch-ua': '"Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"',
+    'sec-ch-ua-mobile': '?0',
+}
 
 if __name__ == "__main__":
     # 从API请求数据
-    r = requests.get("https://air.cnemc.cn:18007/emcpublish/ClientBin/Env-CnemcPublish-RiaServices-EnvCnemcPublishDomainService.svc/binary/GetAQIDataPublishLives", verify=False)
-    # r = open('cnemc_202104271813','rb') # 本地文件则可以直接打开
+    r = requests.post('https://air.cnemc.cn:18007/HourChangesPublish/GetAllAQIPublishLive', headers=headers, verify=False)
 
-    # 解析数据,将其变为类似于从文件读取数据的形式
-    records = Record.parse(BufferedReader(BytesIO(r.content)))
-    # records = Record.parse(r) # 本地文件的上面读入后是直接解析的，所以上面是构造成类似的文件流的形式
-
-    # 将 print 在 std.out 的内容赋予变量 out_xml
-    f = StringIO()
-    with redirect_stdout(f):
-        print_records(records)
-    out_xml = f.getvalue()
-
-    # 将数据从总的 xml 转为各个 dict 组成的 list
-    data_dict = data_from_xml_json(out_xml)
+    # 解析得到的 json 数据
+    data_dict = json.loads(r.content)
 
     # 将字典转为 DataFrame
     df = pd.DataFrame.from_dict(data_dict)
+    
+    # 对应原来输出的文件格式
+    df.columns = df.columns.map(str.lower)
+    df['timepoint'] = df['timepointstr'].str.replace('年', '-')\
+                                        .str.replace('月', '-')\
+                                        .str.replace('日 ', 'T')\
+                                        .str.replace('时', '00')
+    
     # 如果出现不同的时间就把全部数据输出一份
     if len(df['timepoint'].unique()) > 1:
         for t in range(len(df['timepoint'].unique())):
@@ -84,7 +53,7 @@ if __name__ == "__main__":
               'o3', 'o3_24h', 'o3_8h', 'o3_8h_24h',
               'no2', 'no2_24h', 'so2', 'so2_24h',
               'co', 'co_24h']]
-    df_ = df_.where(df != '-;', np.nan)
+    df_ = df_.where(df != '—', np.nan)
 
     # 将每小时数据保存为 csv 文件
     timestamp = df['timepoint'].unique()[-1][:13]
