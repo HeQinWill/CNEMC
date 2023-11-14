@@ -1,4 +1,4 @@
-##  [CNEMC](https://air.cnemc.cn:18007/) 
+##  [CNEMC](https://air.cnemc.cn:18007) 
 从中国环境总站采集空气质量六参数（逐小时更新）  
 数据发布说明里需注意的地方  
 > - 监测点位1小时浓度平均值指该点位1小时内所测项目浓度的算术平均值或测量值，如16时的小时均值为15:00-16:00的算术平均值或测量值。
@@ -20,9 +20,9 @@
 官网现在还提供了一份 GeoJSON 的底图文件供使用: https://air.cnemc.cn:18007/Content/Scripts/Map/China.json
 
 ### 本地部署
-- 获取返回的 JSON 格式站点观测结果
+- 获取返回的 JSON 格式站点观测结果（现在需要使用 post 方式）
 ```sh
-/usr/bin/wget "https://air.cnemc.cn:18007/HourChangesPublish/GetAllAQIPublishLive" --no-check-certificate -O /home/yourName/cnemc_$(date +%Y%m%d%H%M)
+/usr/bin/wget "https://air.cnemc.cn:18007/HourChangesPublish/GetAllAQIPublishLive" --no-check-certificate --post-data='' -O /home/opc/cnemc/cnemc_$(date +%Y%m%d%H%M).json
 ```
 或者
 ```sh
@@ -40,8 +40,6 @@ curl -k 'https://air.cnemc.cn:18007/HourChangesPublish/GetAllAQIPublishLive' \
   -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0' \
   -H 'X-Requested-With: XMLHttpRequest' \
   -H 'sec-ch-ua: "Microsoft Edge";v="119", "Chromium";v="119", "Not?A_Brand";v="24"' \
-  -H 'sec-ch-ua-mobile: ?0' \
-  -H 'sec-ch-ua-platform: "macOS"' \
   -o cnemc_$(date +%Y%m%d%H%M).json
 ```
 
