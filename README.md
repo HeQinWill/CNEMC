@@ -43,6 +43,29 @@ curl -k 'https://air.cnemc.cn:18007/HourChangesPublish/GetAllAQIPublishLive' \
   -o cnemc_$(date +%Y%m%d%H%M).json
 ```
 
+- 获取近24小时的数据
+> 感谢 [@StorywithLove](https://github.com/HeQinWill/CNEMC/issues/3) 提醒这个接口，可一定程度填补缺失数据，具体修改请见 Commit [8ed9bb1](https://github.com/HeQinWill/CNEMC/commit/8ed9bb15768d1a070a694c568d2fa53e4f7bd249) 和 [18182df](https://github.com/HeQinWill/CNEMC/commit/18182dfc206f14a0dd4680bfac5b0de258d9ae25)
+```sh
+curl 'https://air.cnemc.cn:18007/HourChangesPublish/GetAQIHistoryByConditionHis' \
+  -X 'POST' \
+  -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' \
+  -H 'Accept: */*' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Accept-Language: zh-CN,zh-Hans;q=0.9' \
+  -H 'Accept-Encoding: gzip, deflate, br' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Origin: https://air.cnemc.cn:18007' \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Safari/605.1.15' \
+  -H 'Content-Length: 28' \
+  -H 'Referer: https://air.cnemc.cn:18007/' \
+  -H 'Connection: keep-alive' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'X-Requested-With: XMLHttpRequest' \
+  -H 'Priority: u=3, i' \
+  --data 'date=2025-11-08+10%3A00%3A00' \
+  -o cnemc_his_$(date +%Y%m%d%H%M).json
+```
+
 - 设置定时任务
 ```sh
 13,43 * * * * /usr/bin/bash /home/yourName/cnemc.sh
