@@ -1,0 +1,30 @@
+name: Python Package
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '24 5 * * *'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        pip install requests numpy pandas
+    - name: Run Python
+      run: |
+        python cnemc_history.py
+    - name: Commit changes
+      run: |
+        git config --global user.email BOT@github.com
+        git config --global user.name githubBOT
+        git add .
+        git commit -m "add missing history" -a
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{secrets.GTOKEN}}
