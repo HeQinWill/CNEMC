@@ -21,9 +21,15 @@ headers = {
     'sec-ch-ua-mobile': '?0',
 }
 
-if __name__ == "__main__":
+def fetch_history(anchor: pd.Timestamp):
+    # 构造请求时间字符串'YYYY-MM-DD HH:00:00'
+    anchor_str = anchor.strftime('%Y-%m-%d %H:00:00')  
+
     # 从API请求数据
-    r = requests.post('https://air.cnemc.cn:18007/HourChangesPublish/GetAllAQIPublishLive', headers=headers, verify=False)
+    r = requests.post('https://air.cnemc.cn:18007/HourChangesPublish/GetAQIHistoryByConditionHis', 
+                      headers=headers, verify=False, 
+                      data={"date": anchor_str},
+                      timeout=60)
 
     # 解析得到的 json 数据
     data_dict = json.loads(r.content)
@@ -59,10 +65,21 @@ if __name__ == "__main__":
     timestamp = df['timepoint'].unique()[-1][:13]
     daily_folder = Path('Archive')/timestamp[:10]
     daily_folder.mkdir(parents=True, exist_ok=True)
-    # 如果已经有过该文件只需要追加此刻获取的即可
+    # 如果已经有过该文件此处选择跳过
     if (daily_folder/(timestamp+'.csv')).exists():
-        df_.to_csv(daily_folder/(timestamp+'.csv'),
-                   index=None, mode='a', header=False)
+        print('文件已存在，跳过...')
     else:
         df_.to_csv(daily_folder/(timestamp+'.csv'),
                    index=None, mode='w')
+        
+
+
+if __name__ == "__main__":
+    # 计算当前时间的整点小时作为锚点时间
+    anchor = pd.Timestamp.now(tz='Asia/Shanghai').floor('h')
+    print('锚点时间：', anchor)
+    
+    # 获取过去24小时的数据
+    for i in range(24, 0, -1):
+        print(i, f'获取 {anchor - pd.Timedelta(hours=i)} 的数据...')
+        fetch_history(anchor - pd.Timedelta(hours=i))
