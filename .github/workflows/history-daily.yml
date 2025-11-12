@@ -3,7 +3,7 @@ name: Python Package
 on:
   workflow_dispatch:
   schedule:
-    - cron: '24 5 * * *'
+    - cron: '59 3 * * *'
 
 jobs:
   build-linux:
