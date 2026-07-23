@@ -82,4 +82,7 @@ if __name__ == "__main__":
     # 获取过去24小时的数据
     for i in range(24, 0, -1):
         print(i, f'获取 {anchor - pd.Timedelta(hours=i)} 的数据...')
-        fetch_history(anchor - pd.Timedelta(hours=i))
+        try:
+            fetch_history(anchor - pd.Timedelta(hours=i))
+        except Exception as e:
+            print(f'抓取失败：{anchor - pd.Timedelta(hours=i)}，错误：{e}')
