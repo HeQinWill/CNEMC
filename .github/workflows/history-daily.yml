@@ -3,15 +3,15 @@ name: Python Package
 on:
   workflow_dispatch:
   schedule:
-    - cron: '59 6,18 * * *'
+    - cron: '9 6,18 * * *'
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
+      max-parallel: 2
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v5
     - name: Install dependencies
       run: |
         pip install requests numpy pandas
