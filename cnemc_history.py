@@ -35,7 +35,7 @@ def fetch_history(anchor: pd.Timestamp):
     data_dict = json.loads(r.content)
 
     # 将字典转为 DataFrame
-    df = pd.DataFrame.from_dict(data_dict)
+    df = pd.DataFrame(data_dict)
     
     # 对应原来输出的文件格式
     df.columns = df.columns.map(str.lower)

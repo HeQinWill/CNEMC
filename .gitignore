@@ -5,3 +5,6 @@ __pycache__/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+.venv/
+__pycache__/
+run.log
